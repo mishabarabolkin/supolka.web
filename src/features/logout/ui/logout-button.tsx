@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
+import { teamQueryRoot } from '@/entities/team';
 import { currentUserQueryKey, logoutUser } from '@/entities/user';
 import { ApiError } from '@/shared/api';
-import { clearToken, useToken } from '@/shared/session';
+import { clearTeamId, clearToken, useToken } from '@/shared/session';
 
 export function LogoutButton() {
   const token = useToken();
@@ -20,18 +21,23 @@ export function LogoutButton() {
 
     try {
       await logoutUser(token);
-      clearToken();
-      queryClient.removeQueries({ queryKey: currentUserQueryKey });
+      clearSession();
       navigate('/login');
     } catch (error) {
       if (error instanceof ApiError && error.status === 401) {
-        clearToken();
-        queryClient.removeQueries({ queryKey: currentUserQueryKey });
+        clearSession();
         navigate('/login');
         return;
       }
       setPending(false);
     }
+  }
+
+  function clearSession() {
+    clearToken();
+    clearTeamId();
+    queryClient.removeQueries({ queryKey: currentUserQueryKey });
+    queryClient.removeQueries({ queryKey: teamQueryRoot });
   }
 
   return (

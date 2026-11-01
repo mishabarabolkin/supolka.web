@@ -1,3 +1,7 @@
+import { ApiError } from './api-error';
+import { runMiddlewares } from './middleware';
+import { sessionExpiredMiddleware } from './session-middleware';
+
 export type HttpMethod = 'GET' | 'POST';
 
 export type HttpOptions = {
@@ -11,17 +15,11 @@ export type HttpResult<T> = {
   token: string | null;
 };
 
-export class ApiError extends Error {
-  readonly id: string;
-  readonly status: number;
-
-  constructor(id: string, message: string, status: number) {
-    super(message);
-    this.name = 'ApiError';
-    this.id = id;
-    this.status = status;
-  }
-}
+export type HttpContext = {
+  path: string;
+  options: HttpOptions;
+  result?: HttpResult<unknown>;
+};
 
 type ErrorPayload = {
   id?: unknown;
@@ -31,6 +29,22 @@ type ErrorPayload = {
 export async function http<T>(
   path: string,
   options: HttpOptions = {},
+): Promise<HttpResult<T>> {
+  const context: HttpContext = { path, options };
+
+  await runMiddlewares(context, [
+    sessionExpiredMiddleware,
+    async (current) => {
+      current.result = await request<T>(current.path, current.options);
+    },
+  ]);
+
+  return context.result as HttpResult<T>;
+}
+
+async function request<T>(
+  path: string,
+  options: HttpOptions,
 ): Promise<HttpResult<T>> {
   const headers: Record<string, string> = {};
 

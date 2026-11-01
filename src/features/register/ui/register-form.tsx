@@ -1,8 +1,9 @@
 import { useState, type FormEvent } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router';
+import { teamQueryRoot } from '@/entities/team';
 import { currentUserQueryKey, loginUser, registerUser } from '@/entities/user';
-import { ApiError } from '@/shared/api';
+import { apiErrorMiddleware, runMiddlewares } from '@/shared/api';
 import { writeToken } from '@/shared/session';
 
 export function RegisterForm() {
@@ -19,21 +20,17 @@ export function RegisterForm() {
     setErrorMessage(null);
     setPending(true);
 
-    try {
-      await registerUser({ email, username, password });
-      const token = await loginUser({ login_id: username, password });
-      queryClient.removeQueries({ queryKey: currentUserQueryKey });
-      writeToken(token);
-      navigate('/');
-    } catch (error) {
-      if (error instanceof ApiError) {
-        setErrorMessage(error.message);
-        setPending(false);
-        return;
-      }
-      setPending(false);
-      throw error;
-    }
+    await runMiddlewares(null, [
+      apiErrorMiddleware(setErrorMessage, setPending),
+      async () => {
+        await registerUser({ email, username, password });
+        const token = await loginUser({ login_id: username, password });
+        queryClient.removeQueries({ queryKey: currentUserQueryKey });
+        queryClient.removeQueries({ queryKey: teamQueryRoot });
+        writeToken(token);
+        navigate('/');
+      },
+    ]);
   }
 
   return (

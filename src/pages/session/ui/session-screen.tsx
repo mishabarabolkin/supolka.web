@@ -5,7 +5,7 @@ import { currentUserQueryKey, useCurrentUser } from '@/entities/user';
 import { LoginForm } from '@/features/login';
 import { ApiError } from '@/shared/api';
 import { useToken } from '@/shared/session';
-import { CurrentUserCard } from './current-user-card';
+import { SignedInSession } from './signed-in-session';
 
 export function SessionScreen({ signedOut }: { signedOut: ReactNode }) {
   const token = useToken();
@@ -36,7 +36,7 @@ export function SessionScreen({ signedOut }: { signedOut: ReactNode }) {
   }
 
   if (currentUser.data && token !== null) {
-    return <CurrentUserCard user={currentUser.data} />;
+    return <SignedInSession user={currentUser.data} />;
   }
 
   if (token !== null && (currentUser.isPending || currentUser.isFetching)) {
