@@ -1,1 +1,2 @@
-export { http } from './http';
+export { ApiError, http } from './http';
+export type { HttpMethod, HttpOptions, HttpResult } from './http';

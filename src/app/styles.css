@@ -1,0 +1,42 @@
+:root {
+  --center-channel-bg: #fff;
+  --center-channel-color: #3d3c40;
+}
+
+body {
+  margin: 0;
+  background: var(--center-channel-bg);
+  color: var(--center-channel-color);
+}
+
+.auth-screen {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 24rem;
+  margin: 10vh auto 0;
+  padding: 0 1.5rem 3rem;
+  color: var(--center-channel-color);
+}
+
+.auth-screen form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.auth-screen label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.auth-screen input,
+.auth-screen button,
+.auth-screen a {
+  font: inherit;
+  color: var(--center-channel-color);
+}
+
+.auth-error {
+  margin: 0;
+}

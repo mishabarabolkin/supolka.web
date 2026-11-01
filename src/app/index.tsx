@@ -1,10 +1,11 @@
-import { PingPage } from '@/pages/ping';
 import { AppProviders } from './providers';
+import { AppRouter } from './router';
+import './styles.css';
 
 export function App() {
   return (
     <AppProviders>
-      <PingPage />
+      <AppRouter />
     </AppProviders>
   );
 }
